@@ -1,4 +1,6 @@
 "use client";
+
+// Import necessary libraries and components
 import { cn } from "@/lib/utils";
 import { IconChevronDown, IconMenu2, IconX } from "@tabler/icons-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,25 +10,37 @@ import React, { useState } from "react";
 import Introduction from "./introduction";
 import { CenteredWithLogo } from "./Footer";
 
-// Define types for nav items
+// Import Shadcn UI components
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+
+// Define types for navigation items
 interface NavItem {
   name: string;
   link: string;
   children?: NavItem[];
 }
 
+// Main component that includes the Navbar and other sections
 export function NavbarWithChildren() {
   return (
-    <div className="w-full bg-neutral-100 dark:bg-neutral-900 py-20 px-2">
-      <Navbar />
+    <div className="w-full bg-gray-50 dark:bg-gray-900 py-20 px-2">
+      <Navbar /> 
+      {/* Navbar component */}
       <div className="h-full mt-8 w-full flex flex-col items-center justify-center gap-10">
-        <Introduction />
-        <CenteredWithLogo />
+        <Introduction /> {/*you can remove this if you want*/}
+        <CenteredWithLogo />{/*you can remove this if you want*/}
       </div>
     </div>
   );
 }
 
+// Navbar component that switches between desktop and mobile navigation
 const Navbar = () => {
   const navItems: NavItem[] = [
     {
@@ -70,55 +84,58 @@ interface NavProps {
   navItems: NavItem[];
 }
 
+// Desktop navigation component
 const DesktopNav: React.FC<NavProps> = ({ navItems }) => {
-  const [active, setActive] = useState<string | null>(null);
-
   return (
     <div
       className={cn(
-        "hidden lg:flex items-center justify-between py-4 px-6 max-w-7xl mx-auto bg-white dark:bg-neutral-950 rounded-full shadow-md",
+        "hidden lg:flex items-center justify-between py-4 px-6 max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-full shadow-md",
         "sticky top-4 inset-x-0 z-50"
       )}
     >
       <Logo />
       <nav className="flex space-x-8">
         {navItems.map((item) => (
-          <div
-            key={item.name}
-            className="relative"
-            onMouseEnter={() => setActive(item.name)}
-            onMouseLeave={() => setActive(null)}
-          >
-            <Link
-              href={item.link}
-              className="text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100"
-            >
-              {item.name}
-            </Link>
-            {active === item.name && item.children && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute left-0 mt-2 w-48 bg-white dark:bg-neutral-900 rounded-md shadow-lg py-2"
-              >
-                {item.children.map((child) => (
-                  <Link
-                    key={child.name}
-                    href={child.link}
-                    className="block px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          <div key={item.name} className="relative group">
+            {item.children ? (
+              // Use Shadcn UI DropdownMenu for items with children
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none"
+                    aria-haspopup="true"
                   >
-                    {child.name}
-                  </Link>
-                ))}
-              </motion.div>
+                    {item.name}
+                    <IconChevronDown size={16} className="ml-1" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white dark:bg-gray-800">
+                  {item.children.map((child) => (
+                    <DropdownMenuItem key={child.name} asChild>
+                      <Link href={child.link} className="w-full">
+                        {child.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link
+                href={item.link}
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              >
+                {item.name}
+              </Link>
             )}
           </div>
         ))}
       </nav>
-      <button className="px-6 py-2 text-sm font-bold rounded-full bg-black dark:bg-white dark:text-black text-white shadow">
+      <Button
+        variant="default"
+        className="px-6 py-2 text-sm font-bold rounded-full"
+      >
         Book a call
-      </button>
+      </Button>
     </div>
   );
 };
@@ -127,15 +144,17 @@ interface MobileNavItemProps {
   item: NavItem;
 }
 
+// Mobile navigation component
 const MobileNav: React.FC<NavProps> = ({ navItems }) => {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <div className="relative flex lg:hidden items-center justify-between py-4 px-6 bg-white dark:bg-neutral-950 shadow-md">
+    <div className="relative flex lg:hidden items-center justify-between py-4 px-6 bg-white dark:bg-gray-800 shadow-md">
       <Logo />
       <button
         onClick={() => setOpen(!open)}
-        className="text-black dark:text-white"
+        className="text-gray-700 dark:text-gray-300 focus:outline-none"
+        aria-label="Toggle menu"
       >
         {open ? <IconX size={24} /> : <IconMenu2 size={24} />}
       </button>
@@ -146,15 +165,18 @@ const MobileNav: React.FC<NavProps> = ({ navItems }) => {
             animate={{ opacity: 1, scaleY: 1 }}
             exit={{ opacity: 0, scaleY: 0 }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
-            className="absolute top-full left-0 right-0 bg-white dark:bg-neutral-950 shadow-md origin-top z-40"
+            className="absolute top-full left-0 right-0 bg-white dark:bg-gray-800 shadow-md origin-top z-40"
           >
             <nav className="flex flex-col py-4">
               {navItems.map((item) => (
                 <MobileNavItem key={item.name} item={item} />
               ))}
-              <button className="mt-4 mx-4 px-6 py-2 text-sm font-bold rounded-full bg-black dark:bg-white dark:text-black text-white shadow">
+              <Button
+                variant="default"
+                className="mt-4 mx-4 px-6 py-2 text-sm font-bold rounded-full"
+              >
                 Book a call
-              </button>
+              </Button>
             </nav>
           </motion.div>
         )}
@@ -163,6 +185,7 @@ const MobileNav: React.FC<NavProps> = ({ navItems }) => {
   );
 };
 
+// Mobile navigation item component
 const MobileNavItem: React.FC<MobileNavItemProps> = ({ item }) => {
   const [open, setOpen] = useState<boolean>(false);
 
@@ -170,7 +193,9 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item }) => {
     <div className="px-4">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100"
+        className="flex items-center justify-between w-full py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none"
+        aria-expanded={open}
+        aria-controls={`mobile-menu-${item.name}`}
       >
         {item.name}
         {item.children && <IconChevronDown size={16} />}
@@ -178,6 +203,7 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item }) => {
       <AnimatePresence>
         {open && item.children && (
           <motion.div
+            id={`mobile-menu-${item.name}`}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -188,7 +214,7 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item }) => {
               <Link
                 key={child.name}
                 href={child.link}
-                className="block py-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
+                className="block py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white"
               >
                 {child.name}
               </Link>
@@ -200,12 +226,13 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ item }) => {
   );
 };
 
+// Logo component
 const Logo: React.FC = () => {
   return (
     <Link href="/" className="flex items-center space-x-2">
-      <Image src="/logo-computer.png" alt="logo" width={30} height={30} />
-      <span className="text-lg font-semibold text-black dark:text-white">
-        ruizTechServices<span className="blinking">|</span>
+      <Image src="/logo-computer.png" alt="Logo" width={30} height={30} />
+      <span className="text-lg font-semibold text-gray-900 dark:text-white">
+        ruizTechServices<span className="animate-pulse">|</span>
       </span>
     </Link>
   );
