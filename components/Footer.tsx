@@ -11,6 +11,7 @@ import Link from "next/link";
 import React from "react";
 
 export function CenteredWithLogo() {
+  const currentYear = new Date().getFullYear();
   const pages = [
     {
       title: "Products",
@@ -67,7 +68,7 @@ export function CenteredWithLogo() {
         </div>
         <div className="flex sm:flex-row flex-col justify-between mt-8 items-center w-full">
           <p className="text-neutral-500 dark:text-neutral-400 mb-8 sm:mb-0">
-            &copy; DevStudios LLABC
+            &copy; {currentYear} ruizTechServices LLC
           </p>
           <div className="flex gap-4">
             <Link href="#">
@@ -134,7 +135,7 @@ const Logo = () => {
       className="font-normal flex space-x-2 items-center text-sm mr-4  text-black px-2 py-1  relative z-20"
     >
       <Image
-        src="https://assets.aceternity.com/logo-dark.png"
+        src="/logo-computer.png"
         alt="logo"
         width={30}
         height={30}
